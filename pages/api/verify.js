@@ -68,6 +68,8 @@ export default async function handler(req, res) {
             reason = 'abuser'
         }
 
+        console.log('here...');
+
         //const record = data.find(x => x.ip === ip);
 
         if (!success)  {
