@@ -114,6 +114,10 @@ export default async function handler(req, res) {
             'reason': reason
         });
     } catch (error) {
-        res.status(500);
+        res.status(200).json({
+            'success': 'no',
+            'reason': error
+        });
+        // res.status(500);
     }
 }
