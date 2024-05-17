@@ -1,17 +1,7 @@
-import { promises as fs } from 'fs';
 import { sql } from "@vercel/postgres";
 import moment from "moment";
 
 const dataPath = '/pages/api/verified.json';
-
-async function getData() {
-    const data = await fs.readFile(process.cwd() + dataPath, 'utf8')
-    return JSON.parse(data)
-}
-
-async function saveData(data) {
-    await fs.writeFile(process.cwd() + dataPath, JSON.stringify(data, null, "\t"))
-}
 
 export default async function handler(req, res) {
     try {
@@ -23,7 +13,10 @@ export default async function handler(req, res) {
         console.log('here...');
 
         const forwarded = req.headers["x-forwarded-for"]
-        const ip = forwarded ? forwarded.split(/, /)[0] : req.connection.remoteAddress
+        //const ip = forwarded ? forwarded.split(/, /)[0] : req.connection.remoteAddress
+
+        const ip = '99.48.231.144'
+
 
         const ipapiResult = await fetch(`https://api.ipapi.is/?q=${ip}&key=${process.env.NEXT_PUBLIC_API_KEY}`)
             .then((res) => res.json())
@@ -70,17 +63,13 @@ export default async function handler(req, res) {
             reason = 'abuser'
         }
 
-        //const record = data.find(x => x.ip === ip);
-
         if (!success)  {
             // the ip is found in the file (which means it was verified at some point, but now
             // returns as an invalid ip), so we need to remove this record from the array.
 
-            //if (record != null) {
-                await sql`DELETE FROM verifiedwallets where ip_address=${ip}`;
-                // data = data.filter(x => x.ip !== ip);
-                // await saveData(data);
-            //}
+            await sql`
+                DELETE FROM verifiedwallets where ip_address=${ip}
+            `;
 
             res.status(200).send({
                 'success': success,
@@ -93,19 +82,13 @@ export default async function handler(req, res) {
         // at this point, we have a verified ip address, we need to either update the timestamp if the
         // record previously existed or add the new record to the array
 
-        //if (record != null) {
-        //    record.timestamp = moment().unix()
-           // await sql`UPDATE verfiedwallets set timestamp = ${moment().unix()} where ip_address = ${ip}`;
-        //} else {
-        //     data.push({
-        //         "ip": ip,
-        //         "wallet": w,
-        //         "timestamp": moment().unix()
-        //     })
-            await sql`INSERT INTO verifiedwallets(ip_address, wallet, timestamp) Values (${ip}, ${w}, ${moment().unix()}) on conflict (ip_address) DO UPDATE SET set timestamp=${moment().unix()}`;
-        //}
+        const {rows} = await sql`SELECT id from verifiedwallets where ip_address=${ip}`;
 
-        //await saveData(data)
+        if (rows.length > 0) {
+            await sql`UPDATE verifiedwallets SET timestamp=${moment().unix()} WHERE ip_address=${ip}`;
+        } else {
+            await sql`INSERT INTO verifiedwallets (ip_address, wallet, timestamp) VALUES (${ip},${w},${moment().unix()})`;
+        }
 
         res.status(200).json({
             'success': success,
