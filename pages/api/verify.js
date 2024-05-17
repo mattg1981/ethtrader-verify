@@ -77,7 +77,7 @@ export default async function handler(req, res) {
             // returns as an invalid ip), so we need to remove this record from the array.
 
             //if (record != null) {
-                await sql`DELETE FROM verfiedwallets where ip_address = '${ip}'`;
+                await sql`DELETE FROM verifiedwallets where ip_address = '${ip}'`;
                 // data = data.filter(x => x.ip !== ip);
                 // await saveData(data);
             //}
@@ -102,7 +102,7 @@ export default async function handler(req, res) {
         //         "wallet": w,
         //         "timestamp": moment().unix()
         //     })
-            await sql`INSERT INTO verfiedwallets(ip_address, wallet, timestamp) Values ('${ip}', '${w}', ${moment().unix()}) on conflict (ip_address) DO UPDATE SET set timestamp = ${moment().unix()}`;
+            await sql`INSERT INTO verifiedwallets(ip_address, wallet, timestamp) Values ('${ip}', '${w}', ${moment().unix()}) on conflict (ip_address) DO UPDATE SET set timestamp = ${moment().unix()}`;
         //}
 
         //await saveData(data)
