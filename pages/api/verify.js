@@ -20,6 +20,8 @@ export default async function handler(req, res) {
             method,
         } = req;
 
+        console.log('here...');
+
         const forwarded = req.headers["x-forwarded-for"]
         const ip = forwarded ? forwarded.split(/, /)[0] : req.connection.remoteAddress
 
@@ -67,8 +69,6 @@ export default async function handler(req, res) {
             success = false;
             reason = 'abuser'
         }
-
-        console.log('here...');
 
         //const record = data.find(x => x.ip === ip);
 
