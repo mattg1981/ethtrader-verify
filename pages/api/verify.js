@@ -22,6 +22,12 @@ export default async function handler(req, res) {
         const forwarded = req.headers["x-forwarded-for"]
         const ip = forwarded ? forwarded.split(/, /)[0] : req.connection.remoteAddress
 
+        res.status(200).json({
+            'wallet': w,
+            'ip': ip
+        });
+        return;
+
         let data = await getData();
 
         const ipapiResult = await fetch(`https://api.ipapi.is/?q=${ip}&key=${process.env.NEXT_PUBLIC_API_KEY}`)
