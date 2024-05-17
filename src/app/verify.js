@@ -2,7 +2,7 @@ import {useSearchParams} from "next/navigation";
 import {useState} from "react";
 
 async function verifyIp(wallet) {
-    return await fetch(`/api/verify?w=${wallet}`)
+    return await fetch(`/ethtrader-verify/api/verify?w=${wallet}`)
         .then((res) => res.json());
 }
 
